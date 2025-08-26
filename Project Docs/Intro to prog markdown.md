@@ -1,3 +1,8 @@
+---
+applyTo: '**'
+---
+Provide project context and coding guidelines that AI should follow when generating code, answering questions, or reviewing changes.
+
 # COM4018 — Introduction to Programming — Assignment Brief (Markdown Port)
 
 ## Overview
@@ -31,6 +36,14 @@
 ---
 
 ## Scenario
+
+* **Scenario and pricing**
+You are required to create and test a new software system for a small shop loaning fishing and camping equipment for hire to customers.
+The fishing and camping equipment available for hire and the cost is listed below. Customers can rent it from 9am to 6pm each day.
+The equipment can be hired from 9am of day 1 but should be returned by 2pm the next day irrespective of the time of collection on day 1.
+For each additional night a 50% discount is applied for each piece of equipment hired.
+If the equipment is returned after 2pm, it will still be counted as an additional night and extra 50% payment for each piece of equipment hired will need to be paid.
+
 
 You will create and test a new software system for a **small shop** that loans **fishing and camping equipment**.
 

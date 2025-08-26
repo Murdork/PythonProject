@@ -225,8 +225,14 @@ def compute_line_cost(line):
     """Corrected version following assignment brief exactly"""
     base = line["daily_p"] * line["nights"] * line["qty"]
     # Overdue should be 100% of daily rate (full rate for overdue days)
-    overdue = line["daily_p"] * line["overdue_days"] * line["qty"]  
-    late_penalty = (line["daily_p"] * line["qty"]) // 2 if line["returned_late"] == "y" else 0
+    overdue = line["daily_p"] * line["overdue_days"] * line["qty"]
+    
+    # Late penalty: 50% of daily rate if returned late
+    if line["returned_late"] == "y":
+        late_penalty = (line["daily_p"] * line["qty"]) // 2
+    else:
+        late_penalty = 0
+        
     total = base + overdue + late_penalty
     return base, overdue, late_penalty, total
 
@@ -296,17 +302,21 @@ def run_hire_flow():
         print(f"Phone       : {rec['phone']}")
         print(f"Address     : {rec['house_no']}, {rec['postcode']}")
         print(f"Card (last4): {rec['card_last4']}")
-        print("\nItems:")
-        grand = 0
-        print("CODE  ITEM                                NIGHT  QTY  OVERDUE  LATE  BASE     OVERDUE   PENALTY   LINE TOTAL")
-        print("----  ----------------------------------  -----  ---  -------  ----  -------  --------  --------  ----------")
-        for ln in lines:
-            grand += ln["line_total_p"]
-            print(f"{ln['code']:<4}  {ln['name'][:34]:<34}  "
-                  f"{ln['nights']:>5}  {ln['qty']:>3}  {ln['overdue_days']:>7}  {ln['returned_late']:^4}  "
-                  f"{money(ln['base_p']):>7}  {money(ln['overdue_p']):>8}  {money(ln['late_penalty_p']):>8}  {money(ln['line_total_p']):>10}")
+        print("Items:")
+        grand_total = 0
+        print("CODE  ITEM                                NIGHT  QTY  OVERDUE  LATE  "
+              "BASE     OVERDUE   PENALTY   LINE TOTAL")
+        print("----  ----------------------------------  -----  ---  -------  ----  "
+              "-------  --------  --------  ----------")
+        for line_item in lines:
+            grand_total += line_item["line_total_p"]
+            print(f"{line_item['code']:<4}  {line_item['name'][:34]:<34}  "
+                  f"{line_item['nights']:>5}  {line_item['qty']:>3}  "
+                  f"{line_item['overdue_days']:>7}  {line_item['returned_late']:^4}  "
+                  f"{money(line_item['base_p']):>7}  {money(line_item['overdue_p']):>8}  "
+                  f"{money(line_item['late_penalty_p']):>8}  {money(line_item['line_total_p']):>10}")
         print("-" * 104)
-        print(f"TOTAL DUE: {money(grand)}")
+        print(f"TOTAL DUE: {money(grand_total)}")
 
         sure = read_yes_no("\nConfirm and save this hire? (y/n): ")
         if sure == "n":
@@ -314,7 +324,7 @@ def run_hire_flow():
             # Loop back to start a new customer entry anyway
             continue
 
-        rec["total_p"] = grand
+        rec["total_p"] = grand_total
         HIRE_RECORDS.append(rec)
         _next_customer_id += 1
         print("Saved. Starting next customer...\n")
@@ -389,13 +399,18 @@ def run_earnings_report():
 
     # ---- Section 3: DETAIL LINES (ALL ENTERED DATA)
     print("\nDetail lines (all entered data):")
-    print("ID   CODE  ITEM                                NIGHT  QTY  OVERDUE  LATE  BASE     OVERDUE   PENALTY   LINE TOTAL")
-    print("---  ----  ----------------------------------  -----  ---  -------  ----  -------  --------  --------  ----------")
-    for r in HIRE_RECORDS:
-        for ln in r["lines"]:
-            print(f"{r['customer_id']:>3}  {ln['code']:<4}  {ln['name'][:34]:<34}  "
-                  f"{ln['nights']:>5}  {ln['qty']:>3}  {ln['overdue_days']:>7}  {ln['returned_late']:^4}  "
-                  f"{money(ln['base_p']):>7}  {money(ln['overdue_p']):>8}  {money(ln['late_penalty_p']):>8}  {money(ln['line_total_p']):>10}")
+    print("ID   CODE  ITEM                                NIGHT  QTY  OVERDUE  LATE  "
+          "BASE     OVERDUE   PENALTY   LINE TOTAL")
+    print("---  ----  ----------------------------------  -----  ---  -------  ----  "
+          "-------  --------  --------  ----------")
+    for hire_record in HIRE_RECORDS:
+        for line_item in hire_record["lines"]:
+            print(f"{hire_record['customer_id']:>3}  {line_item['code']:<4}  "
+                  f"{line_item['name'][:34]:<34}  {line_item['nights']:>5}  "
+                  f"{line_item['qty']:>3}  {line_item['overdue_days']:>7}  "
+                  f"{line_item['returned_late']:^4}  {money(line_item['base_p']):>7}  "
+                  f"{money(line_item['overdue_p']):>8}  {money(line_item['late_penalty_p']):>8}  "
+                  f"{money(line_item['line_total_p']):>10}")
 
 # -----------------------------
 # Main loop
