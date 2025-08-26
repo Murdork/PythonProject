@@ -1,9 +1,5 @@
 # COM4018 — Introduction to Programming — Assignment Brief (Markdown Port)
 
-> **Submission portal:** iLearn (closes at **14:00 UK time** on the due date).
-
----
-
 ## Overview
 
 * **Assessment type:** Coursework (100% of module grade).

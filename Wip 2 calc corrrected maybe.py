@@ -224,8 +224,8 @@ def parse_item_line(raw):
 def compute_line_cost(line):
     """Corrected version following assignment brief exactly"""
     base = line["daily_p"] * line["nights"] * line["qty"]
-    # Overdue should be 50% of daily rate, not 100%
-    overdue = (line["daily_p"] // 2) * line["overdue_days"] * line["qty"]  
+    # Overdue should be 100% of daily rate (full rate for overdue days)
+    overdue = line["daily_p"] * line["overdue_days"] * line["qty"]  
     late_penalty = (line["daily_p"] * line["qty"]) // 2 if line["returned_late"] == "y" else 0
     total = base + overdue + late_penalty
     return base, overdue, late_penalty, total
