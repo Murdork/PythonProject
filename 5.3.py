@@ -1,3 +1,5 @@
+# write a function that detects if a number is 10
+
 # ==========================================
 # COM4018 – Introduction to Programming
 # Tasks 2 & 3 integrated program (enhanced I/O)
